@@ -1,5 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login, logout, authenticate
+
 from .forms import TaskCreationForm
 from .models import Task
 
@@ -90,6 +93,21 @@ def edit_task(request, title):
     }
     return render(request, 'base.html', context)
 
+def register(request):
+    if request.method == "POST":    
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
 
+            user = authenticate(username = username, password = password)
+            login(request, user)
+            return redirect('home')
+        else:
+            form = UserCreationForm()
+            
+        return render(request, "register.html", {'form' : form })
+    
 
-
+    
