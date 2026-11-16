@@ -31,13 +31,55 @@ def home(request):
     return render(request,'base.html', context)
 
 @login_required
-def create_task(request, title):
-    task = get_object_or_404(Task, title = title )
+def create_task(request):
+
+    if request.method == 'POST':
+        data = request.POST
+        taskCreationForm = TaskCreationForm(data)
+        if taskCreationForm.is_valid():
+            task =  taskCreationForm.save(commit=False)
+            task.user = request.user
+            task.save()
+            return redirect("home")
+            
+        else:
+            taskCreationForm = TaskCreationForm()         
+    
+    context= {
+        'taskCreationForm' : taskCreationForm,
+    }
+    return render(request, 'base.html', context)
+
+@login_required
+def task_details(request, title):
+    task = get_object_or_404(Task, title = title, user = request.user)
+    return render(request, '', {'task':task})
+
+
+
+@login_required
+def delete_task(request, title):
+    task = get_object_or_404(Task, title = title, user = request.user)
+    task.delete()
+    return redirect("home")
+
+
+@login_required
+def mark_as_completed(request, title):
+    task = get_object_or_404(Task, title = title, user = request.user)
+    task.is_completed = True
+    task.save()
+    return redirect("home")
+
+
+@login_required
+def edit_task(request, title):
+    task = get_object_or_404(Task, title = title, user = request.user )
     if request.method == 'POST':
         data = request.POST
         taskCreationForm = TaskCreationForm(data, instance=task)
         if taskCreationForm.is_valid():
-            taskCreationForm.save()
+            taskCreationForm.save(commit=False)
             return redirect("home")
             
         else:
@@ -47,4 +89,7 @@ def create_task(request, title):
         'taskCreationForm' : taskCreationForm,
     }
     return render(request, 'base.html', context)
+
+
+
 
