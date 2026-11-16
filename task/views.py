@@ -31,14 +31,17 @@ def home(request):
     return render(request,'base.html', context)
 
 @login_required
-def create_task(request):
+def create_task(request, title):
+    task = get_object_or_404(Task, title = title )
     if request.method == 'POST':
-        taskCreationForm = TaskCreationForm(request.POST)
+        data = request.POST
+        taskCreationForm = TaskCreationForm(data, instance=task)
         if taskCreationForm.is_valid():
             taskCreationForm.save()
+            return redirect("home")
             
         else:
-            taskCreationForm = TaskCreationForm()         
+            taskCreationForm = TaskCreationForm(instance=task)         
     
     context= {
         'taskCreationForm' : taskCreationForm,
