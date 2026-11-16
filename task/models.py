@@ -11,7 +11,7 @@ class Task(models.Model):
         ('Personal', 'Personal'),
         ('Study', 'Study'),
         ('Work', 'Work'),
-        ('Other', 'Work'),
+        ('Other', 'Other'),
     ]
     
     
